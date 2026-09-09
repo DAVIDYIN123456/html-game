@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎾 网球学练机 · 娱乐版</title>
     <style>
-        /* =============================================
-           比利时风格 + 娱乐元素
-           ============================================= */
-
+        /* ========== 样式 ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             background: #F5F0E8;
             min-height: 100vh;
@@ -18,7 +14,6 @@
             justify-content: center;
             align-items: center;
             font-family: 'Helvetica Neue', 'Arial', sans-serif;
-            cursor: none;
             user-select: none;
             padding: 20px;
             overflow: hidden;
@@ -27,17 +22,15 @@
         #customCursor {
             position: fixed;
             pointer-events: none;
-            z-index: 9999;
+            z-index: 99999;
             width: 30px;
             height: 30px;
             transform: translate(-50%, -50%);
             transition: left 0.02s, top 0.02s;
             filter: drop-shadow(0 2px 10px rgba(0,0,0,0.12));
+            will-change: left, top;
         }
-        #customCursor svg {
-            width: 100%;
-            height: 100%;
-        }
+        #customCursor svg { width:100%; height:100%; display:block; }
 
         .container {
             width: 100%;
@@ -48,7 +41,6 @@
             gap: 12px;
         }
 
-        /* ===== 标题 ===== */
         .header {
             width: 100%;
             display: flex;
@@ -57,23 +49,9 @@
             padding: 0 4px 8px 4px;
             border-bottom: 2px solid #C4A882;
         }
-        .header h1 {
-            color: #5C6B4F;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin: 0;
-        }
-        .header .sub {
-            color: #B8A99A;
-            font-size: 10px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: 400;
-        }
+        .header h1 { color: #5C6B4F; font-size: 22px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+        .header .sub { color: #B8A99A; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 400; }
 
-        /* ===== 状态条 ===== */
         .top-bar {
             width: 100%;
             display: flex;
@@ -81,748 +59,406 @@
             align-items: center;
             padding: 0 4px;
         }
-        .round-info {
-            color: #5C6B4F;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
+        .round-info { color: #5C6B4F; font-size: 14px; font-weight: 600; letter-spacing: 1px; }
         .round-info span { color: #B8A99A; font-weight: 400; }
-        .timer {
-            font-size: 18px;
-            font-weight: 600;
-            color: #5C6B4F;
-            font-variant-numeric: tabular-nums;
-        }
+        .timer { font-size: 18px; font-weight: 600; color: #5C6B4F; font-variant-numeric: tabular-nums; }
         .timer.warning { color: #C4A882; }
         .timer.danger { color: #CC0000; animation: pulse-danger 0.5s infinite; }
-        @keyframes pulse-danger {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.1); }
-        }
+        @keyframes pulse-danger { 0%,100% { opacity:1; transform:scale(1); } 50%{ opacity:0.5; transform:scale(1.1); } }
 
-        /* ===== 状态指示器 ===== */
         .mood-bar {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2px 6px;
-            background: rgba(255,255,255,0.3);
-            border: 1px solid rgba(0,0,0,0.05);
-            font-size: 12px;
-            color: #5C6B4F;
+            width:100%; display:flex; justify-content:space-between; align-items:center; padding:2px 6px;
+            background:rgba(255,255,255,0.3); border:1px solid rgba(0,0,0,0.05); font-size:12px; color:#5C6B4F;
         }
-        .mood-bar .mood {
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .mood-bar .mood.fire { color: #FF6600; }
-        .mood-bar .mood.cool { color: #5C6B4F; }
-        .mood-bar .mood.zzz { color: #B8A99A; }
-        .mood-bar .mood.god { color: #FFD700; }
+        .mood-bar .mood { font-weight:600; transition:all 0.3s; }
+        .mood-bar .mood.fire { color:#FF6600; }
+        .mood-bar .mood.cool { color:#5C6B4F; }
+        .mood-bar .mood.zzz { color:#B8A99A; }
+        .mood-bar .mood.god { color:#FFD700; }
 
-        /* ===== 计分板 ===== */
         .scoreboard {
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1.2fr;
-            gap: 0;
-            background: #F5F0E8;
-            border: 1.5px solid #D4C5A0;
-            overflow: hidden;
+            width:100%; display:grid; grid-template-columns:1fr 1fr 1fr 1.2fr;
+            background:#F5F0E8; border:1.5px solid #D4C5A0; overflow:hidden;
         }
         .score-item {
-            padding: 6px 8px;
-            text-align: center;
-            border-right: 1px solid #D4C5A0;
-            background: #FAF7F2;
-            position: relative;
+            padding:6px 8px; text-align:center; border-right:1px solid #D4C5A0; background:#FAF7F2;
         }
-        .score-item:last-child {
-            border-right: none;
-            background: #8B9D7A;
-        }
+        .score-item:last-child { border-right:none; background:#8B9D7A; }
         .score-item:last-child .label,
-        .score-item:last-child .number {
-            color: #FFFFFF;
-        }
+        .score-item:last-child .number { color:#FFFFFF; }
         .score-item .label {
-            display: block;
-            font-size: 8px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #B8A99A;
-            font-weight: 600;
-            margin-bottom: 1px;
+            display:block; font-size:8px; text-transform:uppercase; letter-spacing:2px;
+            color:#B8A99A; font-weight:600; margin-bottom:1px;
         }
         .score-item .number {
-            display: block;
-            font-size: 22px;
-            font-weight: 600;
-            color: #5C6B4F;
-            line-height: 1.2;
-            font-variant-numeric: tabular-nums;
-            transition: all 0.3s;
+            display:block; font-size:22px; font-weight:600; color:#5C6B4F;
+            line-height:1.2; font-variant-numeric:tabular-nums; transition:all 0.3s;
         }
-        .score-item .number.pop {
-            animation: pop-number 0.3s ease-out;
-        }
+        .score-item .number.pop { animation:pop-number 0.3s ease-out; }
         @keyframes pop-number {
-            0% { transform: scale(0.5); opacity: 0.3; }
-            50% { transform: scale(1.4); color: #FFD700; }
-            100% { transform: scale(1); opacity: 1; }
+            0%{ transform:scale(0.5); opacity:0.3; }
+            50%{ transform:scale(1.4); color:#FFD700; }
+            100%{ transform:scale(1); opacity:1; }
         }
 
         .dot-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 3px;
-            vertical-align: middle;
-            border: 1px solid rgba(0,0,0,0.06);
+            display:inline-block; width:10px; height:10px; border-radius:50%;
+            margin-right:3px; vertical-align:middle; border:1px solid rgba(0,0,0,0.06);
         }
-        .dot-indicator.big { background: #5C6B4F; }
-        .dot-indicator.mid { background: #B8A99A; }
-        .dot-indicator.small { background: #C4A882; }
+        .dot-indicator.big { background:#5C6B4F; }
+        .dot-indicator.mid { background:#B8A99A; }
+        .dot-indicator.small { background:#C4A882; }
 
-        /* ===== 连击显示 ===== */
-        .combo-display {
-            font-size: 12px;
-            color: #B8A99A;
-            letter-spacing: 1px;
-        }
-        .combo-display .fire {
-            color: #FF6600;
-            font-weight: 700;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-        .combo-display .fire.super {
-            color: #FFD700;
-            font-size: 22px;
-            text-shadow: 0 0 20px rgba(255,215,0,0.5);
-        }
+        .combo-display { font-size:12px; color:#B8A99A; letter-spacing:1px; }
+        .combo-display .fire { color:#FF6600; font-weight:700; font-size:16px; transition:all 0.2s; }
+        .combo-display .fire.super { color:#FFD700; font-size:22px; text-shadow:0 0 20px rgba(255,215,0,0.5); }
 
-        /* ===== 状态栏 ===== */
         .status-bar {
-            width: 100%;
-            color: #5C6B4F;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            font-weight: 400;
-            padding: 6px 14px;
-            background: #FAF7F2;
-            border: 1.5px solid #D4C5A0;
-            min-height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            gap: 8px;
-            position: relative;
-            overflow: hidden;
+            width:100%; color:#5C6B4F; font-size:13px; letter-spacing:0.5px; font-weight:400;
+            padding:6px 14px; background:#FAF7F2; border:1.5px solid #D4C5A0;
+            min-height:34px; display:flex; align-items:center; justify-content:center;
+            transition:all 0.3s; gap:8px; position:relative; overflow:hidden;
         }
         .status-bar .dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #B8A99A;
+            display:inline-block; width:8px; height:8px; border-radius:50%; background:#B8A99A;
         }
-        .status-bar .dot.red { background: #C4A882; }
-        .status-bar .dot.green { background: #8B9D7A; }
+        .status-bar .dot.red { background:#C4A882; }
+        .status-bar .dot.green { background:#8B9D7A; }
         .status-bar .dot.tennis-ball {
-            background: #D4F12A;
-            width: 10px;
-            height: 10px;
-            border: 1px solid #999;
-            animation: ball-bounce 0.3s ease-in-out;
+            background:#D4F12A; width:10px; height:10px; border:1px solid #999;
+            animation:ball-bounce 0.3s ease-in-out;
         }
-        @keyframes ball-bounce {
-            0% { transform: scale(0.5); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
+        @keyframes ball-bounce { 0%{ transform:scale(0.5); } 50%{ transform:scale(1.3); } 100%{ transform:scale(1); } }
 
-        /* ===== 屏幕震动 ===== */
-        .shake-screen {
-            animation: screen-shake 0.3s ease-in-out;
-        }
+        .shake-screen { animation:screen-shake 0.3s ease-in-out; }
         @keyframes screen-shake {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            10% { transform: translate(-4px, -3px) rotate(-1deg); }
-            20% { transform: translate(4px, 2px) rotate(1deg); }
-            30% { transform: translate(-3px, 4px) rotate(-0.5deg); }
-            40% { transform: translate(3px, -2px) rotate(0.5deg); }
-            50% { transform: translate(-2px, 3px) rotate(-0.3deg); }
-            60% { transform: translate(2px, -3px) rotate(0.3deg); }
-            70% { transform: translate(-1px, 2px) rotate(-0.2deg); }
-            80% { transform: translate(1px, -1px) rotate(0.2deg); }
-            90% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
+            0%{ transform:translate(0,0) rotate(0deg); }
+            10%{ transform:translate(-4px,-3px) rotate(-1deg); }
+            20%{ transform:translate(4px,2px) rotate(1deg); }
+            30%{ transform:translate(-3px,4px) rotate(-0.5deg); }
+            40%{ transform:translate(3px,-2px) rotate(0.5deg); }
+            50%{ transform:translate(-2px,3px) rotate(-0.3deg); }
+            60%{ transform:translate(2px,-3px) rotate(0.3deg); }
+            70%{ transform:translate(-1px,2px) rotate(-0.2deg); }
+            80%{ transform:translate(1px,-1px) rotate(0.2deg); }
+            90%{ transform:translate(0,0) rotate(0deg); }
+            100%{ transform:translate(0,0) rotate(0deg); }
         }
 
-        /* ===== 球场 ===== */
         .court-wrapper {
-            perspective: 900px;
-            perspective-origin: 50% 35%;
-            width: 100%;
-            max-width: 560px;
-            margin: 0;
-            transition: all 0.1s;
+            perspective:900px; perspective-origin:50% 35%;
+            width:100%; max-width:560px; margin:0; transition:all 0.1s;
         }
-
         .court {
-            width: 100%;
-            aspect-ratio: 1.4 / 1;
-            position: relative;
-            transform: rotateX(14deg) scale(1);
-            transform-style: preserve-3d;
-            border-radius: 0;
-            background: #7A8B6A;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-            border: 2px solid rgba(255,255,255,0.06);
-            overflow: visible;
+            width:100%; aspect-ratio:1.4/1; position:relative;
+            transform:rotateX(14deg) scale(1); transform-style:preserve-3d;
+            border-radius:0; background:#7A8B6A;
+            box-shadow:0 20px 60px rgba(0,0,0,0.08);
+            border:2px solid rgba(255,255,255,0.06);
+            overflow:visible;
         }
 
-        /* ===== 场地划线 ===== */
-        .court-outline {
-            position: absolute;
-            inset: 0;
-            pointer-events: none !important;
-        }
+        .court-outline { position:absolute; inset:0; pointer-events:none !important; }
         .court-outline::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border: 2.5px solid rgba(255,255,255,0.45);
-            clip-path: polygon(25% 30%, 75% 30%, 92% 85%, 8% 85%);
+            content:''; position:absolute; inset:0;
+            border:2.5px solid rgba(255,255,255,0.45);
+            clip-path:polygon(25% 30%, 75% 30%, 92% 85%, 8% 85%);
         }
-
         .court-net {
-            position: absolute;
-            left: 25%; right: 25%; top: 30%;
-            height: 2px;
-            background: rgba(255,255,255,0.35);
-            transform: translateY(-50%);
-            pointer-events: none !important;
+            position:absolute; left:25%; right:25%; top:30%;
+            height:2px; background:rgba(255,255,255,0.35);
+            transform:translateY(-50%); pointer-events:none !important;
         }
         .court-baseline {
-            position: absolute;
-            left: 8%; right: 8%; bottom: 15%;
-            height: 2.5px;
-            background: rgba(255,255,255,0.45);
-            transform: translateY(50%);
-            pointer-events: none !important;
+            position:absolute; left:8%; right:8%; bottom:15%;
+            height:2.5px; background:rgba(255,255,255,0.45);
+            transform:translateY(50%); pointer-events:none !important;
         }
         .court-serviceline {
-            position: absolute;
-            left: 17%; right: 17%; top: 55%;
-            height: 2px;
-            background: rgba(255,255,255,0.38);
-            transform: translateY(-50%);
-            pointer-events: none !important;
+            position:absolute; left:17%; right:17%; top:55%;
+            height:2px; background:rgba(255,255,255,0.38);
+            transform:translateY(-50%); pointer-events:none !important;
         }
         .court-centerline {
-            position: absolute;
-            left: 50%; top: 30%; bottom: 45%;
-            width: 2px;
-            background: rgba(255,255,255,0.35);
-            transform: translateX(-50%);
-            pointer-events: none !important;
+            position:absolute; left:50%; top:30%; bottom:45%;
+            width:2px; background:rgba(255,255,255,0.35);
+            transform:translateX(-50%); pointer-events:none !important;
         }
         .court-sv-top {
-            position: absolute;
-            left: 50%; top: 30%;
-            height: 25%; width: 1.5px;
-            background: rgba(255,255,255,0.20);
-            transform: translateX(-50%);
-            pointer-events: none !important;
+            position:absolute; left:50%; top:30%;
+            height:25%; width:1.5px; background:rgba(255,255,255,0.20);
+            transform:translateX(-50%); pointer-events:none !important;
         }
         .court-sv-bottom {
-            position: absolute;
-            left: 50%; top: 55%;
-            height: 30%; width: 1.5px;
-            background: rgba(255,255,255,0.20);
-            transform: translateX(-50%);
-            pointer-events: none !important;
+            position:absolute; left:50%; top:55%;
+            height:30%; width:1.5px; background:rgba(255,255,255,0.20);
+            transform:translateX(-50%); pointer-events:none !important;
         }
         .court-singles {
-            position: absolute;
-            inset: 0;
-            border: 1.5px solid rgba(255,255,255,0.20);
-            clip-path: polygon(32% 30%, 68% 30%, 86% 85%, 14% 85%);
-            pointer-events: none !important;
+            position:absolute; inset:0;
+            border:1.5px solid rgba(255,255,255,0.20);
+            clip-path:polygon(32% 30%, 68% 30%, 86% 85%, 14% 85%);
+            pointer-events:none !important;
         }
         .court-dot {
-            position: absolute;
-            bottom: 14.5%; left: 50%;
-            width: 6px; height: 6px;
-            background: rgba(255,255,255,0.35);
-            border-radius: 50%;
-            transform: translateX(-50%);
-            pointer-events: none !important;
+            position:absolute; bottom:14.5%; left:50%;
+            width:6px; height:6px; background:rgba(255,255,255,0.35);
+            border-radius:50%; transform:translateX(-50%); pointer-events:none !important;
         }
         .net-post {
-            position: absolute;
-            top: 29%;
-            width: 6px; height: 6px;
-            background: rgba(255,255,255,0.18);
-            border-radius: 50%;
-            pointer-events: none !important;
+            position:absolute; top:29%; width:6px; height:6px;
+            background:rgba(255,255,255,0.18); border-radius:50%;
+            pointer-events:none !important;
         }
-        .net-post.left { left: 24.5%; }
-        .net-post.right { right: 24.5%; }
+        .net-post.left { left:24.5%; }
+        .net-post.right { right:24.5%; }
 
-        /* ===== 发球机 ===== */
         .ball-machine {
-            position: absolute;
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 14%;
-            height: 12%;
-            pointer-events: none;
-            z-index: 6;
+            position:absolute; bottom:10%; left:50%; transform:translateX(-50%);
+            width:14%; height:12%; pointer-events:none; z-index:6;
         }
         .machine-body {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 85%;
-            height: 75%;
-            background: linear-gradient(180deg, #B0B0B0, #787878);
-            border-radius: 8px 8px 6px 6px;
-            border: 1px solid rgba(0,0,0,0.12);
-            box-shadow: inset 0 -6px 12px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.1);
+            position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+            width:85%; height:75%; background:linear-gradient(180deg,#B0B0B0,#787878);
+            border-radius:8px 8px 6px 6px; border:1px solid rgba(0,0,0,0.12);
+            box-shadow:inset 0 -6px 12px rgba(0,0,0,0.2),0 4px 12px rgba(0,0,0,0.1);
         }
         .machine-top {
-            position: absolute;
-            top: -4%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%;
-            height: 10%;
-            background: #8A8A8A;
-            border-radius: 4px 4px 0 0;
-            border: 1px solid rgba(0,0,0,0.08);
+            position:absolute; top:-4%; left:50%; transform:translateX(-50%);
+            width:70%; height:10%; background:#8A8A8A;
+            border-radius:4px 4px 0 0; border:1px solid rgba(0,0,0,0.08);
         }
         .machine-nozzle {
-            position: absolute;
-            bottom: 25%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 35%;
-            height: 22%;
-            background: radial-gradient(ellipse at 50% 40%, #666, #444);
-            border-radius: 4px 4px 8px 8px;
-            border: 1px solid rgba(0,0,0,0.15);
-            box-shadow: inset 0 -4px 8px rgba(0,0,0,0.3);
-            overflow: visible;
+            position:absolute; bottom:25%; left:50%; transform:translateX(-50%);
+            width:35%; height:22%;
+            background:radial-gradient(ellipse at 50% 40%,#666,#444);
+            border-radius:4px 4px 8px 8px; border:1px solid rgba(0,0,0,0.15);
+            box-shadow:inset 0 -4px 8px rgba(0,0,0,0.3); overflow:visible;
         }
         .machine-nozzle::before {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 30%;
-            background: radial-gradient(ellipse, rgba(255,200,50,0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            transition: all 0.3s;
+            content:''; position:absolute; bottom:-2px; left:50%; transform:translateX(-50%);
+            width:80%; height:30%;
+            background:radial-gradient(ellipse,rgba(255,200,50,0.15) 0%,transparent 70%);
+            border-radius:50%; transition:all 0.3s;
         }
         .machine-nozzle.firing::before {
-            background: radial-gradient(ellipse, rgba(255,200,50,0.4) 0%, rgba(255,200,50,0.1) 70%);
-            box-shadow: 0 0 30px rgba(255,200,50,0.2);
+            background:radial-gradient(ellipse,rgba(255,200,50,0.4) 0%,rgba(255,200,50,0.1) 70%);
+            box-shadow:0 0 30px rgba(255,200,50,0.2);
         }
         .machine-nozzle .ball-ready {
-            position: absolute;
-            bottom: -8%;
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            width: 30%;
-            aspect-ratio: 1/1;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, #E8F42A, #C8D420);
-            border: 1px solid rgba(0,0,0,0.15);
-            box-shadow: 0 0 20px rgba(200,212,32,0.2);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position:absolute; bottom:-8%; left:50%; transform:translateX(-50%) scale(0);
+            width:30%; aspect-ratio:1/1; border-radius:50%;
+            background:radial-gradient(circle at 35% 30%,#E8F42A,#C8D420);
+            border:1px solid rgba(0,0,0,0.15);
+            box-shadow:0 0 20px rgba(200,212,32,0.2);
+            transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .machine-nozzle .ball-ready.show {
-            transform: translateX(-50%) scale(1);
-        }
+        .machine-nozzle .ball-ready.show { transform:translateX(-50%) scale(1); }
         .machine-base {
-            position: absolute;
-            bottom: -10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 95%;
-            height: 18%;
-            background: linear-gradient(180deg, #666, #444);
-            border-radius: 3px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-            border: 1px solid rgba(0,0,0,0.1);
+            position:absolute; bottom:-10%; left:50%; transform:translateX(-50%);
+            width:95%; height:18%; background:linear-gradient(180deg,#666,#444);
+            border-radius:3px; box-shadow:0 4px 16px rgba(0,0,0,0.25);
+            border:1px solid rgba(0,0,0,0.1);
         }
         .machine-wheel {
-            position: absolute;
-            bottom: -8%;
-            width: 14%;
-            height: 22%;
-            background: radial-gradient(ellipse, #444, #1a1a1a);
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: inset 0 -2px 6px rgba(0,0,0,0.4);
+            position:absolute; bottom:-8%; width:14%; height:22%;
+            background:radial-gradient(ellipse,#444,#1a1a1a); border-radius:50%;
+            border:1px solid rgba(255,255,255,0.08);
+            box-shadow:inset 0 -2px 6px rgba(0,0,0,0.4);
         }
-        .machine-wheel.left { left: 6%; }
-        .machine-wheel.right { right: 6%; }
+        .machine-wheel.left { left:6%; }
+        .machine-wheel.right { right:6%; }
 
         .machine-led {
-            position: absolute;
-            top: 8%;
-            right: 10%;
-            width: 10%;
-            height: 14%;
-            border-radius: 50%;
-            background: #00CC44;
-            box-shadow: 0 0 10px rgba(0,204,68,0.4);
-            transition: all 0.3s;
-            border: 1px solid rgba(255,255,255,0.1);
+            position:absolute; top:8%; right:10%; width:10%; height:14%; border-radius:50%;
+            background:#00CC44; box-shadow:0 0 10px rgba(0,204,68,0.4);
+            transition:all 0.3s; border:1px solid rgba(255,255,255,0.1);
         }
-        .machine-led.idle { background: #FF8800; box-shadow: 0 0 12px rgba(255,136,0,0.3); }
-        .machine-led.firing { background: #FF2200; box-shadow: 0 0 25px rgba(255,34,0,0.5); animation: led-flash 0.2s ease-in-out 4; }
-        @keyframes led-flash {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.2; transform: scale(0.8); }
+        .machine-led.idle { background:#FF8800; box-shadow:0 0 12px rgba(255,136,0,0.3); }
+        .machine-led.firing {
+            background:#FF2200; box-shadow:0 0 25px rgba(255,34,0,0.5);
+            animation:led-flash 0.2s ease-in-out 4;
         }
+        @keyframes led-flash { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.2; transform:scale(0.8); } }
 
-        /* ===== 飞行球 ===== */
         .flying-ball {
-            position: absolute;
-            width: 5%;
-            height: 5%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, #E8F42A, #C8D420);
-            border: 1px solid rgba(0,0,0,0.15);
-            box-shadow: 0 0 30px rgba(200,212,32,0.3);
-            pointer-events: none;
-            z-index: 20;
-            opacity: 0;
-            left: 50%;
-            top: 75%;
-            transform: translate(-50%, -50%) scale(0.5);
+            position:absolute; width:5%; height:5%; border-radius:50%;
+            background:radial-gradient(circle at 35% 30%,#E8F42A,#C8D420);
+            border:1px solid rgba(0,0,0,0.15);
+            box-shadow:0 0 30px rgba(200,212,32,0.3);
+            pointer-events:none; z-index:20; opacity:0;
+            left:50%; top:75%; transform:translate(-50%,-50%) scale(0.5);
         }
-        .flying-ball.animate {
-            animation: ball-flash 0.15s ease-out forwards;
-        }
+        .flying-ball.animate { animation:ball-flash 0.15s ease-out forwards; }
         @keyframes ball-flash {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+            0%{ opacity:1; transform:translate(-50%,-50%) scale(0.8); }
+            100%{ opacity:0; transform:translate(-50%,-50%) scale(1.5); }
         }
 
-        /* =============================================
-           灯泡 + 粒子特效
-           ============================================= */
         .bulb-container {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 5;
+            position:absolute; inset:0; pointer-events:none; z-index:5;
         }
-
         .bulb {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: auto !important;
-            cursor: none;
-            z-index: 10 !important;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform: translate(-50%, -50%);
-            will-change: transform, width, height, top, left;
-            background: radial-gradient(circle at 32% 28%, #FDFBF8, #E8E0D6);
-            box-shadow: 0 2px 16px rgba(0,0,0,0.06), inset 0 -4px 12px rgba(0,0,0,0.04), inset 0 4px 16px rgba(255,255,255,0.4);
-            border: 2px solid rgba(255,255,255,0.35);
+            position:absolute; border-radius:50%; pointer-events:auto !important;
+            cursor:pointer; z-index:10 !important;
+            transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            transform:translate(-50%,-50%);
+            will-change:transform,width,height,top,left;
+            background:radial-gradient(circle at 32% 28%,#FDFBF8,#E8E0D6);
+            box-shadow:0 2px 16px rgba(0,0,0,0.06),inset 0 -4px 12px rgba(0,0,0,0.04),inset 0 4px 16px rgba(255,255,255,0.4);
+            border:2px solid rgba(255,255,255,0.35);
         }
-
         .bulb::before {
-            content: '';
-            position: absolute;
-            top: 14%; left: 20%;
-            width: 32%; height: 24%;
-            background: radial-gradient(ellipse, rgba(255,255,255,0.50) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            content:''; position:absolute; top:14%; left:20%;
+            width:32%; height:24%;
+            background:radial-gradient(ellipse,rgba(255,255,255,0.50) 0%,transparent 70%);
+            border-radius:50%; pointer-events:none;
         }
-
         .bulb::after {
-            content: '';
-            position: absolute;
-            bottom: -10%; left: 15%;
-            width: 70%; height: 18%;
-            background: radial-gradient(ellipse, rgba(0,0,0,0.06) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(4px);
-            pointer-events: none;
+            content:''; position:absolute; bottom:-10%; left:15%;
+            width:70%; height:18%;
+            background:radial-gradient(ellipse,rgba(0,0,0,0.06) 0%,transparent 70%);
+            border-radius:50%; filter:blur(4px); pointer-events:none;
         }
-
-        /* ===== 红色（目标） ===== */
         .bulb.red {
-            background: radial-gradient(circle at 32% 28%, #E8A87C, #C4A882);
-            box-shadow: 0 0 35px rgba(196,168,130,0.25), 0 0 70px rgba(196,168,130,0.08);
-            border-color: rgba(196,168,130,0.35);
-            animation: pulse-red 0.7s ease-in-out infinite;
+            background:radial-gradient(circle at 32% 28%,#E8A87C,#C4A882);
+            box-shadow:0 0 35px rgba(196,168,130,0.25),0 0 70px rgba(196,168,130,0.08);
+            border-color:rgba(196,168,130,0.35);
+            animation:pulse-red 0.7s ease-in-out infinite;
         }
-        @keyframes pulse-red {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.06); }
-        }
-
-        /* ===== 绿色（命中） ===== */
+        @keyframes pulse-red { 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-50%) scale(1.06); } }
         .bulb.green {
-            background: radial-gradient(circle at 32% 28%, #A8C4A0, #8B9D7A);
-            box-shadow: 0 0 35px rgba(139,157,122,0.20), 0 0 70px rgba(139,157,122,0.06);
-            border-color: rgba(139,157,122,0.35);
+            background:radial-gradient(circle at 32% 28%,#A8C4A0,#8B9D7A);
+            box-shadow:0 0 35px rgba(139,157,122,0.20),0 0 70px rgba(139,157,122,0.06);
+            border-color:rgba(139,157,122,0.35);
+        }
+        .bulb.wrong {
+            background:radial-gradient(circle at 32% 28%,#E8A8A8,#C47A7A);
+            border-color:rgba(196,122,122,0.5);
+            animation:shake-wrong 0.3s ease-in-out;
+        }
+        @keyframes shake-wrong {
+            0%{ transform:translate(-50%,-50%) rotate(0deg); }
+            25%{ transform:translate(-50%,-50%) rotate(-8deg); }
+            75%{ transform:translate(-50%,-50%) rotate(8deg); }
+            100%{ transform:translate(-50%,-50%) rotate(0deg); }
         }
 
-        /* ===== 命中爆炸粒子 ===== */
         .particle-container {
-            position: absolute;
-            pointer-events: none;
-            z-index: 15;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            overflow: visible;
+            position:absolute; pointer-events:none; z-index:15;
+            width:100%; height:100%; top:0; left:0; overflow:visible;
         }
         .particle {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: particle-fly 0.6s ease-out forwards;
+            position:absolute; border-radius:50%; pointer-events:none;
+            animation:particle-fly 0.6s ease-out forwards;
         }
         @keyframes particle-fly {
-            0% { opacity: 1; transform: translate(0, 0) scale(1); }
-            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+            0%{ opacity:1; transform:translate(0,0) scale(1); }
+            100%{ opacity:0; transform:translate(var(--tx),var(--ty)) scale(0); }
         }
-
-        /* ===== 烟花特效 ===== */
         .firework {
-            position: absolute;
-            pointer-events: none;
-            z-index: 25;
-            font-size: 30px;
-            animation: firework-rise 0.8s ease-out forwards;
+            position:absolute; pointer-events:none; z-index:25; font-size:30px;
+            animation:firework-rise 0.8s ease-out forwards;
         }
         @keyframes firework-rise {
-            0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
-            50% { opacity: 1; transform: translate(0, -40px) scale(1.2); }
-            100% { opacity: 0; transform: translate(0, -80px) scale(0.8); }
+            0%{ opacity:1; transform:translate(0,0) scale(0.5); }
+            50%{ opacity:1; transform:translate(0,-40px) scale(1.2); }
+            100%{ opacity:0; transform:translate(0,-80px) scale(0.8); }
         }
 
-        /* ===== 底部 ===== */
         .footer {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 8px;
-            border-top: 1px solid #D4C5A0;
-            flex-wrap: wrap;
-            gap: 6px;
+            width:100%; display:flex; justify-content:space-between; align-items:center;
+            padding-top:8px; border-top:1px solid #D4C5A0; flex-wrap:wrap; gap:6px;
         }
         .hint {
-            color: #B8A99A;
-            font-size: 9px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 400;
+            color:#B8A99A; font-size:9px; letter-spacing:1px;
+            text-transform:uppercase; font-weight:400;
         }
-        .hint .hl-red { color: #C4A882; }
-        .hint .hl-green { color: #8B9D7A; }
-        .hint .hl-yellow { color: #C8D420; }
+        .hint .hl-red { color:#C4A882; }
+        .hint .hl-green { color:#8B9D7A; }
+        .hint .hl-yellow { color:#C8D420; }
 
         .reset-btn {
-            padding: 5px 18px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
-            border: 1.5px solid #8B9D7A;
-            border-radius: 0;
-            background: transparent;
-            color: #5C6B4F;
-            cursor: none;
-            transition: all 0.3s;
+            padding:5px 18px; font-size:10px; text-transform:uppercase; letter-spacing:2px;
+            font-weight:600; border:1.5px solid #8B9D7A; border-radius:0;
+            background:transparent; color:#5C6B4F; cursor:pointer;
+            transition:all 0.3s;
         }
-        .reset-btn:hover {
-            background: #8B9D7A;
-            color: #FFFFFF;
-        }
+        .reset-btn:hover { background:#8B9D7A; color:#FFFFFF; }
 
-        /* =============================================
-           奖励转盘弹窗
-           ============================================= */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(245,240,232,0.75);
-            backdrop-filter: blur(8px);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
+            display:none; position:fixed; inset:0;
+            background:rgba(245,240,232,0.75); backdrop-filter:blur(8px);
+            z-index:10000; justify-content:center; align-items:center;
         }
-        .modal-overlay.active { display: flex; }
-
+        .modal-overlay.active { display:flex; }
         .modal {
-            background: #FAF7F2;
-            padding: 28px 34px;
-            max-width: 420px;
-            width: 90%;
-            border: 1.5px solid #D4C5A0;
-            text-align: center;
-            animation: modal-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background:#FAF7F2; padding:28px 34px; max-width:420px; width:90%;
+            border:1.5px solid #D4C5A0; text-align:center;
+            animation:modal-pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
         }
         @keyframes modal-pop {
-            0% { transform: scale(0.8) rotate(-2deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            0%{ transform:scale(0.8) rotate(-2deg); opacity:0; }
+            100%{ transform:scale(1) rotate(0deg); opacity:1; }
         }
-
-        .modal .emoji-big {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 2px;
-        }
-        .modal h2 {
-            color: #5C6B4F;
-            font-size: 18px;
-            letter-spacing: 2px;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
+        .modal .emoji-big { font-size:48px; display:block; margin-bottom:2px; }
+        .modal h2 { color:#5C6B4F; font-size:18px; letter-spacing:2px; margin-bottom:4px; font-weight:600; }
         .modal .comment {
-            font-size: 14px;
-            color: #5C6B4F;
-            padding: 6px 0 12px 0;
-            line-height: 1.6;
-            min-height: 40px;
-            border-bottom: 1px solid #E8E0D6;
+            font-size:14px; color:#5C6B4F; padding:6px 0 12px 0; line-height:1.6;
+            min-height:40px; border-bottom:1px solid #E8E0D6;
         }
-        .modal .comment .sarcasm { color: #C4A882; font-style: italic; }
-        .modal .comment .praise { color: #8B9D7A; font-weight: 600; }
+        .modal .comment .sarcasm { color:#C4A882; font-style:italic; }
+        .modal .comment .praise { color:#8B9D7A; font-weight:600; }
 
-        /* ===== 奖励轮盘 ===== */
+        /* ===== 奖励轮盘（已隐藏，保留结构以防报错） ===== */
         .reward-wheel {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-            margin: 12px 0 10px 0;
-        }
-        .reward-slot {
-            padding: 10px 6px;
-            background: #F5F0E8;
-            border: 2px solid #E8E0D6;
-            transition: all 0.3s;
-            font-size: 12px;
-            color: #5C6B4F;
-            cursor: none;
-        }
-        .reward-slot .r-emoji { font-size: 24px; display: block; }
-        .reward-slot .r-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #B8A99A; }
-        .reward-slot.highlight {
-            border-color: #FFD700;
-            background: rgba(255,215,0,0.15);
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(255,215,0,0.2);
+            display: none !important;
         }
 
         .modal .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 6px;
-            margin: 10px 0 8px 0;
+            display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px; margin:10px 0 8px 0;
         }
-        .modal .stat-item {
-            background: #F5F0E8;
-            padding: 6px;
-        }
-        .modal .stat-item .num {
-            font-size: 22px;
-            font-weight: 600;
-            color: #5C6B4F;
-        }
-        .modal .stat-item .lbl {
-            font-size: 7px;
-            text-transform: uppercase;
-            color: #B8A99A;
-            letter-spacing: 1px;
-        }
+        .modal .stat-item { background:#F5F0E8; padding:6px; }
+        .modal .stat-item .num { font-size:22px; font-weight:600; color:#5C6B4F; }
+        .modal .stat-item .lbl { font-size:7px; text-transform:uppercase; color:#B8A99A; letter-spacing:1px; }
 
-        .modal .achievements {
-            margin: 6px 0 10px 0;
-            font-size: 12px;
-            color: #5C6B4F;
-            min-height: 24px;
-        }
+        .modal .achievements { margin:6px 0 10px 0; font-size:12px; color:#5C6B4F; min-height:24px; }
         .modal .achievements .badge {
-            display: inline-block;
-            margin: 2px 3px;
-            padding: 2px 8px;
-            background: #E8E0D6;
-            border-radius: 20px;
-            font-size: 10px;
+            display:inline-block; margin:2px 3px; padding:2px 8px;
+            background:#E8E0D6; border-radius:20px; font-size:10px;
         }
-
         .modal .close-btn {
-            padding: 10px 40px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
-            border: none;
-            background: #8B9D7A;
-            color: #FFFFFF;
-            cursor: none;
-            transition: all 0.3s;
-            border-radius: 0;
+            padding:10px 40px; font-size:12px; text-transform:uppercase; letter-spacing:2px;
+            font-weight:600; border:none; background:#8B9D7A; color:#FFFFFF;
+            cursor:pointer; transition:all 0.3s; border-radius:0;
         }
-        .modal .close-btn:hover { background: #7A8B6A; }
+        .modal .close-btn:hover { background:#7A8B6A; }
+        .modal.shame .comment { color:#C4A882; }
+        .modal.shame .close-btn { background:#C4A882; }
+        .modal.shame .close-btn:hover { background:#B89872; }
+        .modal.godlike .comment { color:#5C6B4F; }
+        .modal.godlike .close-btn { background:#FFD700; color:#5C6B4F; }
+        .modal.godlike .close-btn:hover { background:#FFC800; }
 
-        .modal.shame .comment { color: #C4A882; }
-        .modal.shame .close-btn { background: #C4A882; }
-        .modal.shame .close-btn:hover { background: #B89872; }
-        .modal.godlike .comment { color: #5C6B4F; }
-        .modal.godlike .close-btn { background: #FFD700; color: #5C6B4F; }
-        .modal.godlike .close-btn:hover { background: #FFC800; }
-
-        @media (max-width: 600px) {
-            .court-wrapper { max-width: 400px; }
-            .header h1 { font-size: 18px; }
-            .score-item .number { font-size: 18px; }
-            .modal { padding: 18px; }
-            .modal .stat-item .num { font-size: 18px; }
-            .modal .emoji-big { font-size: 36px; }
-            .reward-wheel { grid-template-columns: 1fr 1fr 1fr; }
-            .reward-slot { padding: 6px; }
-            .reward-slot .r-emoji { font-size: 18px; }
+        @media (max-width:600px){
+            .court-wrapper{ max-width:400px; }
+            .header h1{ font-size:18px; }
+            .score-item .number{ font-size:18px; }
+            .modal{ padding:18px; }
+            .modal .stat-item .num{ font-size:18px; }
+            .modal .emoji-big{ font-size:36px; }
         }
-        @media (max-width: 420px) {
-            .court-wrapper { max-width: 320px; }
-            .header h1 { font-size: 14px; }
-            .score-item .number { font-size: 14px; }
-            .top-bar { flex-direction: column; gap: 4px; }
-            .mood-bar { font-size: 10px; flex-wrap: wrap; }
-            .reward-wheel { grid-template-columns: 1fr 1fr 1fr; }
+        @media (max-width:420px){
+            .court-wrapper{ max-width:320px; }
+            .header h1{ font-size:14px; }
+            .score-item .number{ font-size:14px; }
+            .top-bar{ flex-direction:column; gap:4px; }
+            .mood-bar{ font-size:10px; flex-wrap:wrap; }
         }
     </style>
 </head>
 <body>
-
-    <!-- ===== 鼠标 ===== -->
+    <!-- 固定光标 -->
     <div id="customCursor">
         <svg viewBox="0 0 64 64">
             <circle cx="32" cy="32" r="28" fill="#D4F12A" stroke="#333" stroke-width="1.5"/>
@@ -834,48 +470,18 @@
         </svg>
     </div>
 
-    <!-- ===== 成绩弹窗 + 奖励轮盘 ===== -->
+    <!-- ===== 弹窗（无奖励轮盘） ===== -->
     <div class="modal-overlay" id="resultModal">
         <div class="modal" id="modalContent">
             <span class="emoji-big" id="resultEmoji">🏆</span>
             <h2 id="resultTitle">本轮结束</h2>
             <div class="comment" id="resultComment">评价加载中...</div>
-
-            <!-- 奖励轮盘 -->
-            <div class="reward-wheel" id="rewardWheel">
-                <div class="reward-slot" data-reward="double">
-                    <span class="r-emoji">🔥</span>
-                    <span class="r-label">双倍积分</span>
-                </div>
-                <div class="reward-slot" data-reward="freeze">
-                    <span class="r-emoji">⏸️</span>
-                    <span class="r-label">时间冻结</span>
-                </div>
-                <div class="reward-slot" data-reward="magnet">
-                    <span class="r-emoji">🧲</span>
-                    <span class="r-label">磁力锁定</span>
-                </div>
-                <div class="reward-slot" data-reward="trap">
-                    <span class="r-emoji">💀</span>
-                    <span class="r-label">惩罚陷阱</span>
-                </div>
-                <div class="reward-slot" data-reward="mystery">
-                    <span class="r-emoji">❓</span>
-                    <span class="r-label">神秘奖励</span>
-                </div>
-                <div class="reward-slot" data-reward="extra">
-                    <span class="r-emoji">➕</span>
-                    <span class="r-label">额外+3分</span>
-                </div>
-            </div>
-
             <div class="stat-grid">
                 <div class="stat-item"><div class="num" id="rHits">0</div><div class="lbl">命中</div></div>
                 <div class="stat-item"><div class="num" id="rMisses">0</div><div class="lbl">脱靶</div></div>
                 <div class="stat-item"><div class="num" id="rScore">0</div><div class="lbl">得分</div></div>
                 <div class="stat-item"><div class="num" id="rRate">0%</div><div class="lbl">命中率</div></div>
             </div>
-
             <div class="achievements" id="rAchievements"></div>
             <button class="close-btn" id="nextRoundBtn">下一轮 ➜</button>
         </div>
@@ -883,50 +489,30 @@
 
     <!-- ===== 主界面 ===== -->
     <div class="container">
-
         <div class="header">
             <h1>🎾 网球学练机</h1>
             <span class="sub">娱乐版</span>
         </div>
-
         <div class="top-bar">
             <div class="round-info">🎯 第 <span id="roundNum">1</span> / <span id="totalRounds">10</span> 轮</div>
             <div class="timer" id="timerDisplay">⏱️ 35s</div>
         </div>
-
-        <!-- 心情状态条 -->
         <div class="mood-bar">
             <span>📊 状态:</span>
             <span class="mood" id="moodDisplay">😊 稳定</span>
             <span>🏅 最佳: <span id="bestScore">0</span>分</span>
             <span>🔥 连击: <span id="moodCombo">0</span></span>
         </div>
-
         <div class="scoreboard">
-            <div class="score-item">
-                <span class="label"><span class="dot-indicator big"></span> 大</span>
-                <span class="number" id="bigScore">0</span>
-            </div>
-            <div class="score-item">
-                <span class="label"><span class="dot-indicator mid"></span> 中</span>
-                <span class="number" id="midScore">0</span>
-            </div>
-            <div class="score-item">
-                <span class="label"><span class="dot-indicator small"></span> 小</span>
-                <span class="number" id="smallScore">0</span>
-            </div>
-            <div class="score-item">
-                <span class="label">总分</span>
-                <span class="number" id="totalScore">0</span>
-            </div>
+            <div class="score-item"><span class="label"><span class="dot-indicator big"></span> 大</span><span class="number" id="bigScore">0</span></div>
+            <div class="score-item"><span class="label"><span class="dot-indicator mid"></span> 中</span><span class="number" id="midScore">0</span></div>
+            <div class="score-item"><span class="label"><span class="dot-indicator small"></span> 小</span><span class="number" id="smallScore">0</span></div>
+            <div class="score-item"><span class="label">总分</span><span class="number" id="totalScore">0</span></div>
         </div>
-
         <div class="status-bar" id="statusBar">
             <span class="dot"></span> 等待发球...
             <span class="combo-display">| 🔥 连击: <span class="fire" id="comboCount">0</span></span>
         </div>
-
-        <!-- ===== 球场 ===== -->
         <div class="court-wrapper" id="courtWrapper">
             <div class="court" id="court">
                 <div class="court-outline"></div>
@@ -940,7 +526,6 @@
                 <div class="court-dot"></div>
                 <div class="net-post left"></div>
                 <div class="net-post right"></div>
-
                 <div class="ball-machine" id="ballMachine">
                     <div class="machine-body">
                         <div class="machine-top"></div>
@@ -953,41 +538,81 @@
                     <div class="machine-wheel left"></div>
                     <div class="machine-wheel right"></div>
                 </div>
-
                 <div class="flying-ball" id="flyingBall"></div>
                 <div class="bulb-container" id="bulbContainer"></div>
                 <div class="particle-container" id="particleContainer"></div>
             </div>
         </div>
-
         <div class="footer">
             <div class="hint">
                 <span class="hl-yellow">●</span> 发球→亮灯 &nbsp;·&nbsp;
                 <span class="hl-green">●</span> 命中+分 &nbsp;·&nbsp;
                 <span class="hl-red">●</span> 脱靶-1 &nbsp;·&nbsp;
                 连击奖励 &nbsp;·&nbsp;
-                🎰 每轮奖励转盘
+                🔔 命中音效
             </div>
             <button class="reset-btn" id="resetBtn">重新开始</button>
         </div>
-
     </div>
 
     <script>
-        // =============================================
-        //  1. 鼠标跟随
-        // =============================================
-        const cursor = document.getElementById('customCursor');
+        // ============================================================
+        // 1. 自定义光标跟踪
+        // ============================================================
+        const cursorEl = document.getElementById('customCursor');
         document.addEventListener('mousemove', function(e) {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+            cursorEl.style.left = e.clientX + 'px';
+            cursorEl.style.top = e.clientY + 'px';
         });
-        document.addEventListener('mouseleave', function() { cursor.style.display = 'none'; });
-        document.addEventListener('mouseenter', function() { cursor.style.display = 'block'; });
+        document.addEventListener('mouseleave', function() { cursorEl.style.display = 'none'; });
+        document.addEventListener('mouseenter', function() { cursorEl.style.display = 'block'; });
 
-        // =============================================
-        //  2. 游戏引擎
-        // =============================================
+        // ============================================================
+        // 2. 音频引擎（命中时“滴”声）
+        // ============================================================
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) { /* ignore */ }
+            }
+            return audioCtx;
+        }
+
+        function playHitBeep() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1600, now);
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.linearRampToValueAtTime(0.3, now + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.1);
+                const osc2 = ctx.createOscillator();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(2400, now);
+                const gain2 = ctx.createGain();
+                gain2.gain.setValueAtTime(0.001, now);
+                gain2.gain.linearRampToValueAtTime(0.1, now + 0.01);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(now);
+                osc2.stop(now + 0.07);
+            } catch (e) { /* 静默失败 */ }
+        }
+
+        // ============================================================
+        // 3. 游戏引擎（奖励系统已完全移除）
+        // ============================================================
         const CONFIG = {
             roundsPerGame: 10,
             targetsPerRound: 10,
@@ -1002,17 +627,7 @@
             ]
         };
 
-        // =============================================
-        //  3. 奖励系统
-        // =============================================
-        const REWARDS = {
-            double: { label: '双倍积分', emoji: '🔥', desc: '下轮得分×2', color: '#FF6600' },
-            freeze: { label: '时间冻结', emoji: '⏸️', desc: '暂停计时5秒', color: '#4488FF' },
-            magnet: { label: '磁力锁定', emoji: '🧲', desc: '下轮首球自动命中', color: '#AA44FF' },
-            trap: { label: '惩罚陷阱', emoji: '💀', desc: '下轮脱靶扣2分', color: '#CC0000' },
-            mystery: { label: '神秘奖励', emoji: '❓', desc: '随机+3~8分', color: '#FF8800' },
-            extra: { label: '额外加分', emoji: '➕', desc: '直接+3分', color: '#44BB44' }
-        };
+        // 不再使用 REWARDS 对象
 
         let activeRewards = {
             double: false,
@@ -1046,9 +661,6 @@
             isMagnetReady: false
         };
 
-        // =============================================
-        //  4. 评价系统（保留毒舌）
-        // =============================================
         const COMMENTS = {
             godlike: [
                 { emoji: '👑', title: '完美！无懈可击！', comment: '你是费德勒本人吗？这轮表现堪称教科书级别。<span class="praise">建议直接去温布尔登报到。</span>' },
@@ -1089,76 +701,11 @@
             return { ...pool[idx], tier };
         }
 
-        // =============================================
-        //  5. 奖励轮盘抽奖
-        // =============================================
-        function spinRewardWheel() {
-            const rewards = ['double', 'freeze', 'magnet', 'trap', 'mystery', 'extra'];
-            const weights = [15, 15, 15, 12, 20, 23]; // 百分比权重
-            let total = weights.reduce((a, b) => a + b, 0);
-            let rand = Math.random() * total;
-            let chosen = rewards[0];
-            for (let i = 0; i < weights.length; i++) {
-                rand -= weights[i];
-                if (rand <= 0) { chosen = rewards[i]; break; }
-            }
-            return chosen;
-        }
+        // ===== 奖励系统已完全移除 =====
+        // spinRewardWheel, applyReward 已删除
+        // endRound 中不再调用奖励
 
-        function applyReward(rewardKey) {
-            const reward = REWARDS[rewardKey];
-            let msg = '';
-            switch (rewardKey) {
-                case 'double':
-                    activeRewards.double = true;
-                    msg = '🔥 下轮得分×2！';
-                    break;
-                case 'freeze':
-                    activeRewards.freezeActive = true;
-                    // 冻结计时器5秒
-                    if (gameState.timerInterval) {
-                        clearInterval(gameState.timerInterval);
-                        gameState.timer += 5;
-                        timerDisplay.textContent = '⏱️ ' + gameState.timer + 's';
-                        // 重新启动计时器
-                        gameState.timerInterval = setInterval(() => {
-                            gameState.timer--;
-                            timerDisplay.textContent = '⏱️ ' + gameState.timer + 's';
-                            if (gameState.timer <= 5) timerDisplay.className = 'timer warning';
-                            if (gameState.timer <= 0) { endRound(); }
-                        }, 1000);
-                    }
-                    msg = '⏸️ 时间冻结！+5秒';
-                    break;
-                case 'magnet':
-                    activeRewards.magnet = true;
-                    gameState.isMagnetReady = true;
-                    msg = '🧲 磁力锁定！下轮首球自动命中！';
-                    break;
-                case 'trap':
-                    activeRewards.trap = true;
-                    msg = '💀 惩罚陷阱：下轮脱靶扣2分！';
-                    break;
-                case 'mystery':
-                    const bonus = Math.floor(Math.random() * 6) + 3;
-                    gameState.score += bonus;
-                    gameState.totalScore += bonus;
-                    updateDisplay();
-                    msg = '❓ 神秘奖励！+' + bonus + '分！';
-                    break;
-                case 'extra':
-                    gameState.score += 3;
-                    gameState.totalScore += 3;
-                    updateDisplay();
-                    msg = '➕ 额外+3分！';
-                    break;
-            }
-            return { rewardKey, msg, reward };
-        }
-
-        // =============================================
-        //  6. DOM 引用
-        // =============================================
+        // ===== DOM =====
         const container = document.getElementById('bulbContainer');
         const particleContainer = document.getElementById('particleContainer');
         const statusBar = document.getElementById('statusBar');
@@ -1191,13 +738,10 @@
         const rScore = document.getElementById('rScore');
         const rRate = document.getElementById('rRate');
         const rAchievements = document.getElementById('rAchievements');
-        const rewardWheel = document.getElementById('rewardWheel');
 
         totalRounds.textContent = CONFIG.roundsPerGame;
 
-        // =============================================
-        //  7. 灯泡创建
-        // =============================================
+        // ===== 灯泡生成（与之前相同，略） =====
         function generateBulbPositions(rows, cols) {
             const positions = [];
             const topY = 0.32, bottomY = 0.82;
@@ -1253,18 +797,16 @@
                 if (!gameState.roundActive || !gameState.gameActive) return;
 
                 if (states[i] === 'red') {
-                    // ===== 命中！ =====
+                    // ===== 命中 =====
                     let tier = tiers[i];
                     let baseScore = tier === 'big' ? 1 : (tier === 'mid' ? 2 : 3);
 
-                    // 磁力锁定：下轮首球自动命中（本球已命中，消耗）
                     if (gameState.isMagnetReady) {
                         gameState.isMagnetReady = false;
                         activeRewards.magnet = false;
                         statusBar.innerHTML = `<span class="dot green"></span> 🧲 磁力锁定已触发！`;
                     }
 
-                    // 双倍积分
                     if (activeRewards.double) {
                         baseScore *= 2;
                         activeRewards.double = false;
@@ -1291,22 +833,19 @@
                     updateDisplay();
                     updateMood();
 
-                    // 连击特效
+                    playHitBeep();
+
                     let statusMsg = `命中 ${tier} 灯泡  +${totalPts}分`;
                     if (bonus > 0) statusMsg += ` ${comboEmoji} +${bonus}连击奖励`;
                     statusBar.innerHTML = `<span class="dot green"></span> ${statusMsg}`;
                     statusBar.style.color = '#5C6B4F';
 
-                    // 粒子爆炸特效
                     createParticles(this);
 
-                    // 屏幕震动（高连击时）
                     if (gameState.combo >= 5) {
                         courtWrapper.classList.add('shake-screen');
                         setTimeout(() => courtWrapper.classList.remove('shake-screen'), 300);
                     }
-
-                    // 烟花特效（10连击）
                     if (gameState.combo >= 10) {
                         createFireworks(this);
                     }
@@ -1315,8 +854,6 @@
                     this.classList.remove('red');
                     this.classList.add('green');
                     states[i] = 'green';
-                    this.classList.add('shake');
-                    setTimeout(() => this.classList.remove('shake'), 400);
 
                     timers[i] = setTimeout(() => {
                         this.classList.remove('green');
@@ -1347,8 +884,6 @@
                     statusBar.style.color = '#C4A882';
                     this.classList.add('wrong');
                     setTimeout(() => this.classList.remove('wrong'), 500);
-                    this.classList.add('shake');
-                    setTimeout(() => this.classList.remove('shake'), 400);
                     gameState.targetIndex++;
                     checkRoundComplete();
                 }
@@ -1360,15 +895,12 @@
 
         const allBulbs = bulbs;
 
-        // =============================================
-        //  8. 粒子特效
-        // =============================================
+        // ===== 特效（略） =====
         function createParticles(bulbElement) {
             const rect = bulbElement.getBoundingClientRect();
             const courtRect = document.getElementById('court').getBoundingClientRect();
             const colors = ['#FFD700', '#FF6600', '#FF4444', '#44FF88', '#4488FF', '#FF44FF'];
             const count = 12 + Math.floor(Math.random() * 8);
-
             for (let i = 0; i < count; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
@@ -1396,7 +928,6 @@
             const rect = bulbElement.getBoundingClientRect();
             const courtRect = document.getElementById('court').getBoundingClientRect();
             const emojis = ['🎆', '✨', '⭐', '🌟', '💫', '🎇'];
-
             for (let i = 0; i < 8; i++) {
                 const fw = document.createElement('div');
                 fw.className = 'firework';
@@ -1413,9 +944,6 @@
             }
         }
 
-        // =============================================
-        //  9. 游戏逻辑
-        // =============================================
         function updateDisplay() {
             bigDisplay.textContent = gameState.bigScore;
             midDisplay.textContent = gameState.midScore;
@@ -1423,14 +951,11 @@
             totalDisplay.textContent = gameState.score;
             comboCount.textContent = gameState.combo;
             moodCombo.textContent = gameState.combo;
-
-            // 数字弹出动画
             [bigDisplay, midDisplay, smallDisplay, totalDisplay].forEach(el => {
                 el.classList.remove('pop');
                 void el.offsetWidth;
                 el.classList.add('pop');
             });
-
             if (gameState.score > gameState.bestScore) {
                 gameState.bestScore = gameState.score;
                 bestScoreDisplay.textContent = gameState.bestScore;
@@ -1440,16 +965,13 @@
         function updateMood() {
             const rate = gameState.targetIndex > 0 ? (gameState.hits / gameState.targetIndex) : 0;
             const combo = gameState.combo;
-            let mood = '';
-            let cls = '';
-
+            let mood = '', cls = '';
             if (combo >= 8) { mood = '🎆 神级连击！'; cls = 'god'; }
             else if (combo >= 5) { mood = '🔥 火热状态！'; cls = 'fire'; }
             else if (combo >= 3) { mood = '📈 手感上升！'; cls = 'fire'; }
             else if (rate > 0.5) { mood = '😊 稳定发挥'; cls = 'cool'; }
             else if (rate > 0.2) { mood = '😴 有点低迷'; cls = 'zzz'; }
             else { mood = '🥶 需要醒醒！'; cls = 'zzz'; }
-
             moodDisplay.textContent = mood;
             moodDisplay.className = 'mood ' + cls;
         }
@@ -1464,24 +986,19 @@
         function fireBall() {
             if (!gameState.roundActive || !gameState.gameActive) return;
             if (gameState.isWaitingForBall) return;
-
             const reds = states.filter(s => s === 'red').length;
             if (reds > 0) return;
-
             const greens = states.filter(s => s === 'green').length;
             if (greens === TOTAL) {
                 statusBar.innerHTML = `<span class="dot"></span> 所有灯泡恢复中...`;
                 return;
             }
-
             gameState.isWaitingForBall = true;
             machineLed.className = 'machine-led firing';
             machineNozzle.classList.add('firing');
             ballReady.classList.add('show');
-
             statusBar.innerHTML = `<span class="dot tennis-ball"></span> 发球！`;
             statusBar.style.color = '#5C6B4F';
-
             setTimeout(() => {
                 ballReady.classList.remove('show');
                 flyingBall.className = 'flying-ball';
@@ -1489,55 +1006,40 @@
                 flyingBall.className = 'flying-ball animate';
                 machineNozzle.classList.remove('firing');
             }, 350);
-
             setTimeout(() => {
                 machineLed.className = 'machine-led idle';
                 gameState.isWaitingForBall = false;
-
                 const redsAfter = states.filter(s => s === 'red').length;
                 if (redsAfter > 0) return;
-
                 const greensAfter = states.filter(s => s === 'green').length;
                 if (greensAfter === TOTAL) {
                     statusBar.innerHTML = `<span class="dot"></span> 所有灯泡恢复中...`;
                     return;
                 }
-
                 spawnTarget();
             }, 800);
         }
 
         function spawnTarget() {
             if (!gameState.roundActive || !gameState.gameActive) return;
-
             const reds = states.filter(s => s === 'red').length;
             if (reds > 0) return;
-
             const whites = [];
             states.forEach((s, i) => { if (s === 'white') whites.push(i); });
             if (whites.length === 0) {
                 statusBar.innerHTML = `<span class="dot"></span> 等待灯泡恢复...`;
                 return;
             }
-
             let idx = whites[Math.floor(Math.random() * whites.length)];
-
-            // 磁力锁定：强制选一个未命中的灯泡（这里用随机，但会保证命中）
-            // 磁力锁定在点击时处理，这里正常生成
-
             const bulb = allBulbs[idx];
             const tier = tiers[idx];
-
             bulb.classList.add('red');
             states[idx] = 'red';
-
             const tierLabel = tier === 'big' ? '大' : (tier === 'mid' ? '中' : '小');
             const scoreHint = tier === 'big' ? '+1' : (tier === 'mid' ? '+2' : '+3');
             statusBar.innerHTML = `<span class="dot red"></span> ${tierLabel} 目标 (${gameState.targetIndex+1}/${CONFIG.targetsPerRound}) 得${scoreHint}分`;
             statusBar.style.color = '#5C6B4F';
-
             if (timers[idx]) { clearTimeout(timers[idx]); timers[idx] = null; }
-
             timers[idx] = setTimeout(() => {
                 if (states[idx] === 'red') {
                     bulb.classList.remove('red');
@@ -1572,36 +1074,28 @@
             gameState.timer = CONFIG.roundTimeLimit;
             timerDisplay.textContent = '⏱️ ' + gameState.timer + 's';
             timerDisplay.className = 'timer';
-
             allBulbs.forEach((b, i) => {
                 b.classList.remove('red', 'green', 'shake', 'wrong');
                 states[i] = 'white';
                 if (timers[i]) { clearTimeout(timers[i]); timers[i] = null; }
             });
-
             machineLed.className = 'machine-led idle';
             machineNozzle.classList.remove('firing');
             ballReady.classList.remove('show');
             flyingBall.className = 'flying-ball';
-
             updateDisplay();
             updateMood();
             roundNum.textContent = gameState.round;
             statusBar.innerHTML = `<span class="dot green"></span> 第 ${gameState.round} 轮开始！`;
             statusBar.style.color = '#5C6B4F';
-
             if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             gameState.timerInterval = setInterval(() => {
-                if (activeRewards.freezeActive) {
-                    // 冻结状态下不计时
-                    return;
-                }
+                if (activeRewards.freezeActive) return;
                 gameState.timer--;
                 timerDisplay.textContent = '⏱️ ' + gameState.timer + 's';
                 if (gameState.timer <= 5) timerDisplay.className = 'timer warning';
                 if (gameState.timer <= 0) { endRound(); }
             }, 1000);
-
             if (gameState.ballIntervalId) clearInterval(gameState.ballIntervalId);
             gameState.ballIntervalId = setInterval(fireBall, CONFIG.ballInterval);
             setTimeout(fireBall, 600);
@@ -1611,47 +1105,34 @@
             gameState.roundActive = false;
             if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             if (gameState.ballIntervalId) clearInterval(gameState.ballIntervalId);
-
             allBulbs.forEach((b, i) => {
                 b.classList.remove('red');
                 if (states[i] === 'red') { states[i] = 'white'; }
                 if (timers[i]) { clearTimeout(timers[i]); timers[i] = null; }
             });
-
             machineLed.className = 'machine-led idle';
             machineNozzle.classList.remove('firing');
             ballReady.classList.remove('show');
             flyingBall.className = 'flying-ball';
             gameState.isWaitingForBall = false;
-
             const hitRate = gameState.targetIndex > 0 ? Math.round((gameState.hits / gameState.targetIndex) * 100) : 0;
-
-            // 收集成就
             const achievements = [];
             if (hitRate >= 70 && gameState.round > 1) achievements.push('🥈 稳扎稳打');
             if (gameState.hits === gameState.targetIndex && gameState.targetIndex > 0) achievements.push('🥇 百发百中');
             if (gameState.maxCombo >= 10) achievements.push('🔥 热手');
             if (gameState.timer > 28 && gameState.hits >= 5) achievements.push('⚡ 闪电侠');
             if (gameState.score >= 15) achievements.push('⭐ 得分高手');
-
             gameState.roundHistory.push({
                 round: gameState.round, hits: gameState.hits, misses: gameState.misses,
                 score: gameState.score, rate: hitRate, maxCombo: gameState.maxCombo
             });
-
             for (const a of achievements) {
                 if (!gameState.unlockedAchievements.includes(a)) {
                     gameState.unlockedAchievements.push(a);
                 }
             }
-
-            // 抽奖励
-            const rewardKey = spinRewardWheel();
-            const rewardResult = applyReward(rewardKey);
-
-            // 显示弹窗（带奖励）
-            showResultModal(hitRate, achievements, rewardResult);
-
+            // ===== 奖励系统已完全移除 =====
+            showResultModal(hitRate, achievements);
             if (gameState.round >= CONFIG.roundsPerGame) {
                 nextBtn.textContent = '🏆 查看总结';
             } else {
@@ -1659,49 +1140,31 @@
             }
         }
 
-        // ---- 显示弹窗 ----
-        function showResultModal(rate, achievements, rewardResult) {
+        function showResultModal(rate, achievements) {
             const comment = getComment(rate, gameState.score);
-
             resultEmoji.textContent = comment.emoji;
             resultTitle.textContent = comment.title;
-            resultComment.innerHTML = comment.comment + `<br><br>🎰 奖励: ${rewardResult.reward.emoji} ${rewardResult.reward.label} — ${rewardResult.msg}`;
-
+            resultComment.innerHTML = comment.comment;
             rHits.textContent = gameState.hits;
             rMisses.textContent = gameState.misses;
             rScore.textContent = gameState.score;
             rRate.textContent = rate + '%';
-
-            // 高亮奖励
-            const slots = rewardWheel.querySelectorAll('.reward-slot');
-            slots.forEach(slot => {
-                slot.classList.remove('highlight');
-                if (slot.dataset.reward === rewardResult.rewardKey) {
-                    slot.classList.add('highlight');
-                }
-            });
-
             modalContent.className = 'modal';
             if (comment.tier === 'trash' || comment.tier === 'poor') {
                 modalContent.classList.add('shame');
             } else if (comment.tier === 'godlike') {
                 modalContent.classList.add('godlike');
             }
-
             const achHtml = achievements.length > 0
                 ? achievements.map(a => `<span class="badge">${a}</span>`).join('')
                 : '<span style="color:#B8A99A;font-size:12px;">继续努力，解锁成就！</span>';
             rAchievements.innerHTML = achHtml;
-
             modal.classList.add('active');
         }
 
-        // ---- 下一轮 ----
         function nextRound() {
             modal.classList.remove('active');
-            // 重置奖励状态（保留部分）
             activeRewards.freezeActive = false;
-            // double, magnet, trap 在下一轮生效
             if (gameState.round >= CONFIG.roundsPerGame) {
                 showGameSummary();
                 return;
@@ -1710,18 +1173,15 @@
             startRound();
         }
 
-        // ---- 游戏总结 ----
         function showGameSummary() {
             const totalHits = gameState.roundHistory.reduce((s, r) => s + r.hits, 0);
             const totalMisses = gameState.roundHistory.reduce((s, r) => s + r.misses, 0);
             const totalRate = totalHits + totalMisses > 0 ? Math.round((totalHits / (totalHits + totalMisses)) * 100) : 0;
-
             let finalComment = '';
             if (totalRate >= 80) finalComment = '🏆 你简直是网球天才！发球机被你打哭了。';
             else if (totalRate >= 60) finalComment = '👏 不错的成绩！你证明了你不是来球场拍照的。';
             else if (totalRate >= 40) finalComment = '😅 嗯...你尽力了。至少你出了一身汗，对吧？';
             else finalComment = '🤦 10轮训练，你成功让我怀疑人生。建议你换一项运动。';
-
             let msg = '🏆 训练完成！\n\n';
             msg += `📊 总命中: ${totalHits}  总脱靶: ${totalMisses}\n`;
             msg += `🎯 总命中率: ${totalRate}%\n`;
@@ -1735,7 +1195,6 @@
             resetGame();
         }
 
-        // ---- 重置 ----
         function resetGame() {
             modal.classList.remove('active');
             gameState.round = 1;
@@ -1754,21 +1213,17 @@
             gameState.bestScore = 0;
             gameState.isMagnetReady = false;
             activeRewards = { double: false, magnet: false, trap: false, freezeActive: false, freezeTimer: null };
-
             if (gameState.timerInterval) clearInterval(gameState.timerInterval);
             if (gameState.ballIntervalId) clearInterval(gameState.ballIntervalId);
-
             allBulbs.forEach((b, i) => {
                 b.classList.remove('red', 'green', 'shake', 'wrong');
                 states[i] = 'white';
                 if (timers[i]) { clearTimeout(timers[i]); timers[i] = null; }
             });
-
             machineLed.className = 'machine-led idle';
             machineNozzle.classList.remove('firing');
             ballReady.classList.remove('show');
             flyingBall.className = 'flying-ball';
-
             updateDisplay();
             updateMood();
             roundNum.textContent = '1';
@@ -1781,18 +1236,12 @@
             setTimeout(startRound, 500);
         }
 
-        // ---- 事件绑定 ----
         nextBtn.addEventListener('click', nextRound);
         resetBtn.addEventListener('click', function() {
             if (confirm('确定要重新开始吗？')) resetGame();
         });
 
-        // ---- 启动 ----
-        console.log('🎾 网球学练机 · 娱乐版 已启动！');
-        console.log('🎰 每轮结束有奖励转盘！');
-        console.log('🔥 高连击触发特效！');
         setTimeout(startRound, 500);
     </script>
-
 </body>
 </html>
